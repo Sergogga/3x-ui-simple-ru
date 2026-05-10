@@ -1,0 +1,8 @@
+Design system reference placeholder.
+
+Keep external LLM-oriented references in this directory.
+Do not paste large third-party documents unless the license allows it.
+
+Language policy:
+- Internal reference notes: English.
+- User-facing Russian UI copy examples: Russian.

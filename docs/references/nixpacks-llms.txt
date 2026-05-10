@@ -1,0 +1,4 @@
+Nixpacks reference placeholder.
+
+Use this file only if Nixpacks becomes relevant to the repository.
+Keep notes concise and cite the upstream source in commit/PR context when possible.
