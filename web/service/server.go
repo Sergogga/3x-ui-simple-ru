@@ -493,14 +493,16 @@ func (s *ServerService) sampleCPUUtilization() (float64, error) {
 }
 
 var xrayVersionsClient = &http.Client{Timeout: 10 * time.Second}
+var xrayReleasesURL = "https://api.github.com/repos/XTLS/Xray-core/releases"
+
+const preferredDefaultXrayVersion = "v26.1.23"
 
 func (s *ServerService) GetXrayVersions() ([]string, error) {
 	const (
-		XrayURL    = "https://api.github.com/repos/XTLS/Xray-core/releases"
 		bufferSize = 8192
 	)
 
-	resp, err := xrayVersionsClient.Get(XrayURL)
+	resp, err := xrayVersionsClient.Get(xrayReleasesURL)
 	if err != nil {
 		return nil, err
 	}
@@ -549,6 +551,15 @@ func (s *ServerService) GetXrayVersions() ([]string, error) {
 
 		if major > 26 || (major == 26 && minor > 4) || (major == 26 && minor == 4 && patch >= 25) {
 			versions = append(versions, release.TagName)
+		}
+	}
+
+	// Keep preferred stable baseline first for UI flows that preselect
+	// the first returned version.
+	for i, v := range versions {
+		if v == preferredDefaultXrayVersion {
+			versions[0], versions[i] = versions[i], versions[0]
+			break
 		}
 	}
 	return versions, nil

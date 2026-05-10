@@ -65,8 +65,8 @@ Expected affected areas (to be confirmed during implementation):
 
 ## Steps
 
-- [ ] Create detailed OpenVPN domain model + API contract draft and map against existing panel architecture.
-- [ ] Audit current WireGuard inbound data flow (DB model, API handlers, UI state, config generation).
+- [x] Create detailed OpenVPN domain model + API contract draft and map against existing panel architecture.
+- [x] Audit current WireGuard inbound data flow (DB model, API handlers, UI state, config generation).
 - [ ] Implement backend support for OpenVPN entities and config generation.
 - [ ] Implement backend support for multiple WireGuard clients per inbound.
 - [ ] Add/adjust DB migrations for new entities/relations (if required).
@@ -76,6 +76,36 @@ Expected affected areas (to be confirmed during implementation):
 - [ ] Add tests for new backend logic and critical API flows.
 - [ ] Run lint/build/test verification gates and perform manual smoke checks.
 - [ ] Update required architecture/product/security/reliability/frontend docs.
+
+## Progress updates
+
+### 2026-05-10
+
+Completed discovery + design preparation for the first implementation wave.
+
+1. **OpenVPN model and API draft prepared**
+   - Proposed DB entity: `openvpn_clients` (id, inbound_id nullable for future server binding, remark, username/cn, status, cert_ref, key_ref, profile_path, created_at, updated_at, revoked_at).
+   - Proposed secret handling: certificate/private key material is never stored in plaintext logs; only file refs/metadata in DB.
+   - Proposed API surface under existing inbound/client management style:
+     - `GET /panel/api/inbounds/openvpn/clients`
+     - `POST /panel/api/inbounds/openvpn/clients`
+     - `POST /panel/api/inbounds/openvpn/clients/{id}/revoke`
+     - `DELETE /panel/api/inbounds/openvpn/clients/{id}`
+     - `GET /panel/api/inbounds/openvpn/clients/{id}/export`
+   - Compatibility note: keep route/auth/session conventions aligned with existing panel API patterns; no change to public service names, install paths, or DB root path.
+
+2. **WireGuard flow audit completed**
+   - Frontend currently already renders multiple generated WireGuard configs/links in:
+     - `frontend/src/pages/inbounds/InboundInfoModal.vue`
+     - `frontend/src/pages/inbounds/QrCodeModal.vue`
+   - Frontend model generation methods are centralized in:
+     - `frontend/src/models/inbound.js` (`genWireguardConfigs`, `genWireguardLinks` call sites confirmed).
+   - Next backend tasks: confirm whether DB/API still assumes single-client peer storage and implement persistent per-peer lifecycle (create/revoke/delete/export), not only derived multi-output rendering.
+
+3. **Default Xray version rollout started**
+   - Backend version-list endpoint now prefers `v26.1.23` as the first item when this version exists in the fetched GitHub release set.
+   - This preserves compatibility with current API contracts and lets UI flows that preselect the first version align with the required default baseline.
+   - Added deterministic unit tests with a mocked HTTP server for the Xray release-list ordering behavior (preferred-present and preferred-missing scenarios).
 
 ## Verification
 
