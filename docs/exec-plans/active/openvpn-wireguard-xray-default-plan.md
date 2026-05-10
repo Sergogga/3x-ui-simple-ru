@@ -102,6 +102,11 @@ Completed discovery + design preparation for the first implementation wave.
      - `frontend/src/models/inbound.js` (`genWireguardConfigs`, `genWireguardLinks` call sites confirmed).
    - Next backend tasks: confirm whether DB/API still assumes single-client peer storage and implement persistent per-peer lifecycle (create/revoke/delete/export), not only derived multi-output rendering.
 
+3. **Default Xray version rollout started**
+   - Backend version-list endpoint now prefers `v26.1.23` as the first item when this version exists in the fetched GitHub release set.
+   - This preserves compatibility with current API contracts and lets UI flows that preselect the first version align with the required default baseline.
+   - Added deterministic unit tests with a mocked HTTP server for the Xray release-list ordering behavior (preferred-present and preferred-missing scenarios).
+
 ## Verification
 
 Planned verification commands (to execute during implementation phase):
